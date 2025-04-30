@@ -1,6 +1,6 @@
-streamlit
-openai-whisper
-argostranslate
-torch
-sentencepiece
-ffmpeg-python
+streamlit==1.25.0
+openai-whisper==20230918
+argostranslate==1.9.6
+torch==2.0.1
+sentencepiece==0.1.99
+ffmpeg-python==0.2.0
