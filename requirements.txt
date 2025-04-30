@@ -1,5 +1,5 @@
 streamlit
-openai-whisper==20230918
+openai-whisper
 argostranslate
 torch
 sentencepiece
