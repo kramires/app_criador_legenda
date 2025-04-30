@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from argostranslate import translate
 import torch
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 def format_time(seconds):
     hours = int(seconds // 3600)
