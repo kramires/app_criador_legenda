@@ -4,9 +4,26 @@ import tempfile
 import os
 from pathlib import Path
 from argostranslate import translate
+import argostranslate.package
 import torch
 import warnings
 warnings.filterwarnings("ignore", category=SyntaxWarning)
+
+# Dicionário com nomes de idiomas por extenso
+LANGUAGE_NAMES = {
+    "en": "Inglês",
+    "es": "Espanhol",
+    "fr": "Francês",
+    "de": "Alemão",
+    "it": "Italiano",
+    "pt": "Português",
+    "pb": "Português (Brasil)",
+    "ru": "Russo",
+    "zh": "Chinês",
+    "ja": "Japonês",
+    "ko": "Coreano",
+    # Adicione mais conforme necessário
+}
 
 def format_time(seconds):
     hours = int(seconds // 3600)
@@ -15,7 +32,22 @@ def format_time(seconds):
     millis = int((seconds - int(seconds)) * 1000)
     return f"{hours:02}:{minutes:02}:{secs:02},{millis:03}"
 
+def verificar_e_instalar_pacote(origem, destino):
+    pacotes_disponiveis = argostranslate.package.get_available_packages()
+    pacote_desejado = next((p for p in pacotes_disponiveis if p.from_code == origem and p.to_code == destino), None)
+    if pacote_desejado:
+        download_path = pacote_desejado.download()
+        argostranslate.package.install_from_path(download_path)
+
 def carregar_tradutor(origem, destino):
+    idiomas = translate.get_installed_languages()
+    lang_origem = next((l for l in idiomas if l.code == origem), None)
+    lang_destino = next((l for l in idiomas if l.code == destino), None)
+    if lang_origem and lang_destino:
+        tradutor = lang_origem.get_translation(lang_destino)
+        if tradutor:
+            return tradutor
+    verificar_e_instalar_pacote(origem, destino)
     idiomas = translate.get_installed_languages()
     lang_origem = next((l for l in idiomas if l.code == origem), None)
     lang_destino = next((l for l in idiomas if l.code == destino), None)
@@ -60,7 +92,6 @@ st.title("🗣️ Transcrição e Tradução Online com Legendas")
 uploaded_file = st.file_uploader("Envie seu arquivo de áudio ou vídeo", type=["mp3", "mp4", "wav", "m4a"])
 
 if uploaded_file:
-    # Força a extensão correta do arquivo, caso o Streamlit não reconheça MIME corretamente
     extensao = Path(uploaded_file.name).suffix or ".mp3"
     with tempfile.NamedTemporaryFile(delete=False, suffix=extensao) as temp:
         temp.write(uploaded_file.read())
@@ -79,9 +110,8 @@ if uploaded_file:
     resultado = model.transcribe(temp_path)
     idioma_detectado = resultado.get("language", "auto")
 
-    idiomas = translate.get_installed_languages()
-    idioma_nome = next((l.name for l in idiomas if l.code == idioma_detectado), idioma_detectado)
-    st.success(f"Idioma detectado: {idioma_detectado.upper()} - {idioma_nome}")
+    idioma_nome = LANGUAGE_NAMES.get(idioma_detectado, idioma_detectado)
+    st.success(f"Idioma detectado: {idioma_nome}")
 
     srt_original = gerar_srt(resultado["segments"], traduzido=False)
     srt_traduzido = gerar_srt(resultado["segments"], traduzido=True, idioma_origem=idioma_detectado)
