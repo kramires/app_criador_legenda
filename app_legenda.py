@@ -58,15 +58,19 @@ st.title("🗣️ Transcrição e Tradução Online com Legendas")
 uploaded_file = st.file_uploader("Envie seu arquivo de áudio ou vídeo", type=["mp3", "mp4", "wav", "m4a"])
 
 if uploaded_file:
-    with tempfile.NamedTemporaryFile(delete=False, suffix=Path(uploaded_file.name).suffix) as temp:
+    # Força a extensão correta do arquivo, caso o Streamlit não reconheça MIME corretamente
+    extensao = Path(uploaded_file.name).suffix or ".mp3"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=extensao) as temp:
         temp.write(uploaded_file.read())
         temp_path = temp.name
 
-    st.subheader("🎧 Reproduzir Arquivo")
-    if uploaded_file.type.startswith("audio"):
+    st.subheader("🎧 Visualização do Arquivo")
+    if extensao.lower() in [".mp3", ".wav", ".m4a"]:
         st.audio(temp_path)
-    else:
+    elif extensao.lower() in [".mp4", ".mov", ".avi", ".mkv"]:
         st.video(temp_path)
+    else:
+        st.warning("Tipo de arquivo não suportado para reprodução.")
 
     st.subheader("🔁 Transcrevendo...")
     model = whisper.load_model("medium")
