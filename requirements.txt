@@ -1,0 +1,6 @@
+streamlit
+openai-whisper
+argostranslate
+torch
+sentencepiece
+ffmpeg-python
