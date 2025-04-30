@@ -75,7 +75,7 @@ if uploaded_file:
         st.warning("Tipo de arquivo não suportado para reprodução.")
 
     st.subheader("🔁 Transcrevendo...")
-    model = whisper.load_model("medium")
+    model = whisper.load_model("base")
     resultado = model.transcribe(temp_path)
     idioma_detectado = resultado.get("language", "auto")
 
