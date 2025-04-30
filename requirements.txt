@@ -1,6 +1,6 @@
 streamlit
 openai-whisper
 argostranslate
-torch
+torch==2.2.0
 sentencepiece
 ffmpeg-python

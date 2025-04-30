@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 from argostranslate import translate
 import torch
-torch.classes  # força o carregamento correto
 
 def format_time(seconds):
     hours = int(seconds // 3600)
